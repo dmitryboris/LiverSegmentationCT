@@ -1,8 +1,5 @@
-import os
-
-from django.conf import settings
 from django.shortcuts import render, redirect
-from .processing import save_image, process_image
+from .processing import save_image, process_images
 from . import forms
 
 
@@ -10,11 +7,14 @@ def upload(request):
     if request.method == 'POST':
         form = forms.DCMFileUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            uploaded_file = form.cleaned_data['dcm_file']
+            files = form.cleaned_data['dcm_files']
 
-            file_path = save_image(uploaded_file)
+            paths = []
+            for file in files:
+                file_path = save_image(file)
+                paths.append(file_path)
 
-            request.session['original_image'] = file_path
+            request.session['original_images'] = paths
 
             return redirect('image_processing:result')
     else:
@@ -23,10 +23,11 @@ def upload(request):
 
 
 def result(request):
-    image_path = request.session.get('original_image')
-    overlay_url = process_image(image_path)
+    image_paths = request.session.get('original_images')
+    results = process_images(image_paths)
 
     return render(request, 'image_processing/result.html', {
-        'overlay': overlay_url
+        'results': results
     })
+
 
