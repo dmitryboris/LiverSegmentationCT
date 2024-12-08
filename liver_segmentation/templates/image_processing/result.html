@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Результат обработки</title>
+</head>
+<body>
+    <h1>Результат обработки</h1>
+
+    <div>
+        <h3>Original Image</h3>
+        <img src="{{ original_image.url }}" alt="Original Image">
+    </div>
+    <div>
+        <h3>Predicted Mask</h3>
+        <img src="{{ predicted_mask.url }}" alt="Predicted Mask">
+    </div>
+    <div>
+        <h3>Overlay</h3>
+        <img src="{{ overlay }}" alt="Overlay">
+    </div>
+</body>
+</html>

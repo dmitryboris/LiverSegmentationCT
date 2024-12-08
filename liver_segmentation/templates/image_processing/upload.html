@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Загрузка DCM файла</title>
+    <link rel="stylesheet"  href="{% static 'image_processing/upload.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Сегментация КТ-снимка печени</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="upload-button">Загрузить</button>
+        </form>
+        <p class="hint">или перетащите файл сюда</p>
+    </div>
+</body>
+</html>
