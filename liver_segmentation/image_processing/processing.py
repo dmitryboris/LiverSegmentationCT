@@ -138,7 +138,7 @@ def process_images(image_paths):
         'x_col': 0,
         'target_size': (512, 512),
         'color_mode': 'grayscale',
-        'batch_size': 1,
+        'batch_size': len(image_paths),
         'class_mode': None,
         'shuffle': False,
         'seed': 42,
@@ -150,32 +150,28 @@ def process_images(image_paths):
     )
     data_g = idg_test_data.flow_from_dataframe(X, **val_gen_params)
 
+    batch_images = next(data_g)
+    predicted_masks = model.predict(batch_images).astype(np.uint8).squeeze()
+
     save_dir = os.path.join(settings.MEDIA_ROOT, 'result')
     os.makedirs(save_dir, exist_ok=True)
 
     results = []
-    for i, image in enumerate(data_g):
-        if i >= len(image_paths):
-            break
-
+    for i, (image, predicted_mask) in enumerate(zip(batch_images, predicted_masks)):
         image_path = X.iloc[i, 0]
-        image_array = np.array(Image.open(image_path))
-        image_array = image_array.astype(np.uint8)
+        image_array = np.array(Image.open(image_path)).astype(np.uint8)
 
-        name = os.path.splitext(os.path.basename(image_paths[0]))[0]
+        name = os.path.splitext(os.path.basename(image_path))[0]
         save_path_orig = os.path.join(save_dir, f'{name}.png')
         Image.fromarray(image_array).save(save_path_orig)
 
-        predicted_mask = model.predict(image).astype(np.uint8).squeeze()
         image_with_contours = draw_contours(image_array, predicted_mask)
 
         save_path_seg = os.path.join(save_dir, f'processed_{name}.png')
-
         cv2.imwrite(save_path_seg, image_with_contours)
 
         processed_url = os.path.join(settings.MEDIA_URL, 'result', f"processed_{name}.png")
         original_url = os.path.join(settings.MEDIA_URL, 'result', f"{name}.png")
-
 
         results.append({
             'original': original_url,
