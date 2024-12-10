@@ -19,7 +19,7 @@
         <section class="Result_segmentation">
             <div class="section_title_Result"><h1>Результаты сегментации</h1></div>
             {% for result in results %}
-                <a href="#" class="btn_name">Название Файла</a>
+                <p href="#" class="btn_name">{{ result.name }}</p>
                 <div class="start_block_result_segmentation">
                     <div class="first_part">
                         <div class="original_picture_desc_text">
