@@ -5,17 +5,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Загрузка DCM файла</title>
-    <link rel="stylesheet"  href="{% static 'image_processing/upload.css' %}">
+    <link rel="stylesheet" href="{% static 'image_processing/css/upload.css' %}">
+    <link rel="shortcut icon" href="https://img.icons8.com/?size=100&id=20620&format=png&color=000000" type="image/png">
 </head>
 <body>
-    <div class="container">
-        <h1>Сегментация КТ-снимка печени</h1>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="upload-button">Загрузить</button>
-        </form>
-        <p class="hint">или перетащите файл сюда</p>
-    </div>
+    <header class="header">
+        <div class="header_logo">
+            <img src="{% static 'image_processing/images/icon.svg' %}" alt="Логотип">
+           <a href="{% url 'image_processing:upload' %}"> <h3>Еликор</h3></a>
+        </div>
+    </header>
+    <main class="main ">
+        <section class="Segmentation_container container">
+            <div class="welcome_content">
+              <div class="describe_content">
+                <div class="decs_block_text">
+                    <div class="decs_header_text"><h2>Сегментация КТ-снимков печени</h2></div>
+                    <div class="form_desc">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                        </form>
+                    </div>
+                  <a href="#" class="bth_click">Обработать</a>
+                </div>
+                <div class="last_text_desc">
+                    <h3>или перетащите файл сюда</h3>
+                </div>
+              </div>
+            </div>
+          <div class="bth_click_two">
+            <a href="#">Загрузить снимки для расширения нашего датасета</a>
+          </div>
+        </section>
+    </main>
+    <footer class="footer">
+        <div class="footer_logo_block">
+            <div class="footer_logo">
+                <img src="{% static 'image_processing/images/icon.svg' %}" alt="Логотип">
+                <a href="{% url 'image_processing:upload' %}"> <h3>Еликор</h3></a>
+            </div>
+            <div class="footer_email"><a href="#">@example.com</a></div>
+        </div>
+    </footer>
 </body>
 </html>

@@ -6,7 +6,7 @@ class DCMFileUploadForm(forms.Form):
         label="Выберите DCM файлы",
         widget=forms.ClearableFileInput(attrs={
             'class': 'file-input',
-            'multiple': True
+            'dcm_files': True
         })
     )
 
