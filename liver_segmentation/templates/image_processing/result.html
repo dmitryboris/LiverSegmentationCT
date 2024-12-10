@@ -5,27 +5,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Результаты обработки</title>
-    <link rel="stylesheet" href="{% static 'image_processing/result.css' %}">
+   <link rel="stylesheet" href="{% static 'image_processing/css/result.css' %}">
+    <link rel="shortcut icon" href="https://img.icons8.com/?size=100&id=20620&format=png&color=000000" type="image/png">
 </head>
 <body>
-    <h1>Результаты сегментации</h1>
-    <div class="results">
-        {% for result in results %}
-            <div class="file-container">
-                <h2>Файл {{ result.name }}</h2>
-                <div class="images-row">
-                    <div class="image-box">
-                        <p>Оригинальное изображение</p>
-                        <img src="{{ result.original }}" alt="Оригинальное изображение">
+    <header class="header">
+        <div class="block_header_log">
+            <img src="{% static 'image_processing/images/icon.svg' %}" alt="Логотип">
+            <a href="{% url 'image_processing:upload' %}"> <h3>Еликор</h3></a>
+        </div>
+    </header>
+    <main class="main">
+        <section class="Result_segmentation">
+            <div class="section_title_Result"><h1>Результаты сегментации</h1></div>
+            {% for result in results %}
+                <a href="#" class="btn_name">Название Файла</a>
+                <div class="start_block_result_segmentation">
+                    <div class="first_part">
+                        <div class="original_picture_desc_text">
+                            <h3>Оригинальное изображение</h3>
+                        </div>
+                        <div class="result_original_image"><img src="{{ result.original }}" alt="Оригинальное изображение"></div>
                     </div>
-                    <div class="image-box">
-                        <p>Обработанное изображение</p>
-                        <img src="{{ result.processed }}" alt="Обработанное изображение">
+                    <div class="Second_part">
+                        <div class="original_picture_desc_text">
+                            <h3>Обработанное изображение</h3>
+                        </div>
+                        <div class="result_original_image"><img src="{{ result.processed }}" alt="Обработанное изображение"></div>
                     </div>
                 </div>
+            {% endfor %}
+        </section>
+    </main>
+    <footer class="footer">
+        <div class="footer_block_logo">
+            <div class="block_header_log">
+                <img src="{% static 'image_processing/images/icon.svg' %}" alt="Логотип">
+                <a href="{% url 'image_processing:upload' %}"> <h3>Еликор</h3></a>
             </div>
-        {% endfor %}
-    </div>
+            <div class="email_website">@example.com</div>
+       </div>
+    </footer>
 </body>
 </html>
 

@@ -12,7 +12,7 @@
     <header class="header">
         <div class="header_logo">
             <img src="{% static 'image_processing/images/icon.svg' %}" alt="Логотип">
-           <a href="{% url 'image_processing:upload' %}"> <h3>Еликор</h3></a>
+            <a href="{% url 'image_processing:upload' %}"> <h3>Еликор</h3></a>
         </div>
     </header>
     <main class="main ">
@@ -25,12 +25,9 @@
                         <form method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             {{ form.as_p }}
+                            <button type="submit" class="bth_click">Загрузить</button>
                         </form>
                     </div>
-                  <a href="#" class="bth_click">Обработать</a>
-                </div>
-                <div class="last_text_desc">
-                    <h3>или перетащите файл сюда</h3>
                 </div>
               </div>
             </div>
