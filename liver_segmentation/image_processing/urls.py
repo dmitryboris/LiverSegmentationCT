@@ -11,4 +11,6 @@ app_name = 'image_processing'
 urlpatterns = [
     path('', views.upload, name='upload'),
     path('result/', views.result, name='result'),
+    path('result/<int:pk>/', views.show_and_edit_image, name='show_image'),
+    path('result/save-edited/<int:pk>/', views.save_edited_image, name='save_edited_image'),
 ]

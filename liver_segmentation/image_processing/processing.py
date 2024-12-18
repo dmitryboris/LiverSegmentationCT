@@ -1,5 +1,6 @@
 import os
 from django.conf import settings
+from .models import LiverImage
 
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, concatenate, Dropout, BatchNormalization
@@ -13,6 +14,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import cv2
 import pandas as pd
+import uuid
 
 K.set_image_data_format('channels_first')
 
@@ -124,7 +126,7 @@ def draw_contours(image_array, predicted_mask):
     image_with_contours = cv2.cvtColor(image_array, cv2.COLOR_GRAY2BGR)
     cv2.drawContours(image_with_contours, contours, -1, (0, 0, 255), 2)
 
-    return image_with_contours
+    return image_with_contours, contours
 
 
 def process_images(image_paths):
@@ -153,8 +155,10 @@ def process_images(image_paths):
     batch_images = next(data_g)
     predicted_masks = model.predict(batch_images).astype(np.uint8).squeeze()
 
-    save_dir = os.path.join(settings.MEDIA_ROOT, 'result')
-    os.makedirs(save_dir, exist_ok=True)
+    save_dir_orig = os.path.join(settings.MEDIA_ROOT, 'result/original/')
+    save_dir_proc = os.path.join(settings.MEDIA_ROOT, 'result/processed/')
+    os.makedirs(save_dir_orig, exist_ok=True)
+    os.makedirs(save_dir_proc, exist_ok=True)
 
     results = []
     for i, (image, predicted_mask) in enumerate(zip(batch_images, predicted_masks)):
@@ -162,22 +166,25 @@ def process_images(image_paths):
         image_array = np.array(Image.open(image_path)).astype(np.uint8)
 
         name = os.path.splitext(os.path.basename(image_path))[0]
-        save_path_orig = os.path.join(save_dir, f'{name}.png')
+        random_prefix = uuid.uuid4()
+        save_path_orig = os.path.join(save_dir_orig, f'{random_prefix}_{name}.png')
         Image.fromarray(image_array).save(save_path_orig)
 
-        image_with_contours = draw_contours(image_array, predicted_mask)
+        image_with_contours, contours = draw_contours(image_array, predicted_mask)
 
-        save_path_seg = os.path.join(save_dir, f'processed_{name}.png')
-        cv2.imwrite(save_path_seg, image_with_contours)
+        save_path_proc = os.path.join(save_dir_proc, f'{random_prefix}_{name}.png')
+        cv2.imwrite(save_path_proc, image_with_contours)
 
-        processed_url = os.path.join(settings.MEDIA_URL, 'result', f"processed_{name}.png")
-        original_url = os.path.join(settings.MEDIA_URL, 'result', f"{name}.png")
+        processed_url = os.path.join(settings.MEDIA_URL, 'result/processed/', f'{random_prefix}_{name}.png')
+        original_url = os.path.join(settings.MEDIA_URL, 'result/original/', f'{random_prefix}_{name}.png')
 
-        results.append({
-            'original': original_url,
-            'processed': processed_url,
-            'name': name
-        })
+        liver_image = LiverImage.objects.create(
+            title=name,
+            original_url=original_url,
+            processed_url=processed_url
+        )
+
+        results.append(liver_image)
 
     return results
 

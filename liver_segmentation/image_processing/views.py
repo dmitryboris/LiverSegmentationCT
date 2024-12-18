@@ -1,11 +1,18 @@
-from django.shortcuts import render, redirect
+import base64
+
+from django.core.files.base import ContentFile
+from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
+
 from .processing import save_image, process_images
-from . import forms
+from .forms import DCMFileUploadForm
+from .models import LiverImage
 
 
 def upload(request):
     if request.method == 'POST':
-        form = forms.DCMFileUploadForm(request.POST, request.FILES)
+        form = DCMFileUploadForm(request.POST, request.FILES)
         if form.is_valid():
             files = form.cleaned_data['dcm_files']
 
@@ -18,7 +25,7 @@ def upload(request):
 
             return redirect('image_processing:result')
     else:
-        form = forms.DCMFileUploadForm()
+        form = DCMFileUploadForm()
     return render(request, 'image_processing/upload.html', {'form': form})
 
 
@@ -31,3 +38,19 @@ def result(request):
     })
 
 
+def show_and_edit_image(request, pk):
+    image = get_object_or_404(LiverImage, pk=pk)
+    return render(request, 'image_processing/show_image.html', {'image': image})
+
+
+@csrf_exempt
+def save_edited_image(request, pk):
+    if request.method == 'POST':
+        contour = get_object_or_404(LiverImage, pk=pk)
+        data = request.POST.get('image')
+        image_data = data.split(",")[1]  # Убираем "data:image/png;base64,"
+        """contour.edited_mask.save(
+            f"edited_{pk}.png",
+            ContentFile(base64.b64decode(image_data))
+        )"""
+        return JsonResponse({'status': 'success'})

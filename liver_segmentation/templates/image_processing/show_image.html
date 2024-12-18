@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/fabric@4.6.0/dist/fabric.min.js"></script>
+    <title>{{ image.title }}</title>
+</head>
+<body>
+    <h1>Редактирование КТ-снимка с контуром печени {{ image.title }}</h1>
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <button id="save">Сохранить изменения</button>
+
+    <script>
+        const canvas = new fabric.Canvas('canvas');
+
+        // Функция для загрузки изображения и контуров
+        function loadImageAndContour(ktImageUrl, contourPoints) {
+            // Загружаем КТ-снимок на холст
+            fabric.Image.fromURL(ktImageUrl, function(img) {
+                canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+                canvas.renderAll();
+            });
+
+            // Нарисуем контур печени на основе переданных точек
+            const contourPath = new fabric.Polygon(contourPoints, {
+                fill: 'transparent',
+                stroke: 'red',
+                strokeWidth: 3,
+                selectable: false
+            });
+            canvas.add(contourPath);
+        }
+
+        // Пример координат контуров (это могут быть реальные координаты для вашего контурного изображения)
+        const contourPoints = [
+            { x: 50, y: 50 },
+            { x: 300, y: 50 },
+            { x: 300, y: 200 },
+            { x: 50, y: 200 },
+            { x: 50, y: 200 }
+        ];
+
+        // Загрузим изображение КТ-снимка и контур
+        const ktImageUrl = "{{ image.processed_url }}";  // Здесь путь к вашему изображению КТ-снимка
+        loadImageAndContour(ktImageUrl, contourPoints);
+
+        // Включим режим рисования для редактирования контура
+        canvas.isDrawingMode = true;
+
+        // Сохранение изменений
+        document.getElementById('save').addEventListener('click', function() {
+            const editedDataURL = canvas.toDataURL();
+            fetch("{% url 'image_processing:save_edited_image' image.id %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ image: editedDataURL })
+            });
+        });
+    </script>
+</body>
+</html>
+
