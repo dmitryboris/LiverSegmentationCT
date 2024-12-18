@@ -1,3 +1,4 @@
+import json
 import os
 from django.conf import settings
 from .models import LiverImage
@@ -11,7 +12,6 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from medpy.io import load, header
 import numpy as np
 from PIL import Image
-import matplotlib.pyplot as plt
 import cv2
 import pandas as pd
 import uuid
@@ -178,13 +178,22 @@ def process_images(image_paths):
         processed_url = os.path.join(settings.MEDIA_URL, 'result/processed/', f'{random_prefix}_{name}.png')
         original_url = os.path.join(settings.MEDIA_URL, 'result/original/', f'{random_prefix}_{name}.png')
 
+        result = []
+        for contour in contours:
+            for point in contour.tolist():
+                result.append(point[0])
+
+        contours_json = json.dumps(result)
+
         liver_image = LiverImage.objects.create(
             title=name,
             original_url=original_url,
-            processed_url=processed_url
+            processed_url=processed_url,
+            contours=contours_json,
         )
 
         results.append(liver_image)
+
 
     return results
 

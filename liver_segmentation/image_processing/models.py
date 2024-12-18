@@ -7,6 +7,7 @@ class LiverImage(models.Model):
     title = models.CharField(max_length=255)
     original_url = models.ImageField(upload_to='result/original/', verbose_name='Оригинальное изображение')
     processed_url = models.ImageField(upload_to='result/processed/', verbose_name='Обработанное изображение')
+    contours = models.JSONField(default=list)
 
     def __str__(self):
-        return f"Image {self.id} - {self.original_url.name}"
+        return f"Image {self.id} - {self.title}"
