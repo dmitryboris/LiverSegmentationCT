@@ -52,12 +52,12 @@ a {
     font-size: 40px;
     color: #000;
     text-align: center;
-    margin-bottom: 60px;
+    margin-bottom: 10px;
 }
 
 .btn_name {
-    border-radius: 7px;
-    width: 319px;
+    border-radius: 40px;
+    width: 320px;
     height: 72px;
     background: #b30000;
     display: flex;
@@ -67,8 +67,8 @@ a {
     font-weight: 400;
     font-size: 32px;
     color: #f2f0f0;
-    margin-bottom: 86px;
-    margin-top: 100px
+    margin-bottom: 50px;
+    margin-top: 50px
 }
 
 
@@ -87,10 +87,12 @@ a {
     flex-direction: column;
 }
 
-.original_picture_desc_text {
+.original_picture_text, .processed_picture_text {
+    box-sizing: border-box; /* Включаем границу в размер */
+    border: 1px solid transparent; /* Устанавливаем прозрачную границу */
     border-radius: 20px;
-    width: 368px;
-    height: 34px;
+    width: 370px;
+    height: 35px;
     background-color: #000;
     color: rgb(255, 255, 255);
     text-align: center;
@@ -104,6 +106,28 @@ a {
     margin-bottom: 19px;
     margin-left: 85px;
 }
+
+.title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 400;
+    box-sizing: border-box;
+    border: 1px solid black;
+    border-radius: 20px;
+    width: 370px;
+    height: 35px;
+    margin: 30px auto;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+.processed_picture_text:hover {
+    background-color: white;
+    color: black;
+    border-color: black; /* Изменяем цвет границы */
+    transition: 0.3s;
+}
+
 
 .footer {
     padding-top: 26px;
@@ -124,4 +148,39 @@ a {
     font-size: 15px;
     color: #fff;
     text-decoration: underline;
+}
+
+.description {
+    text-align: center;
+    font-size: 20px;
+}
+
+.button-container {
+    display: flex; /* Включаем флекс-контейнер */
+    justify-content: center; /* Горизонтальное выравнивание по центру */
+    align-items: center; /* Вертикальное выравнивание по центру */
+    margin-bottom: 50px;
+    margin-top: 50px;
+}
+
+.save-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #800000; /* Бордовый цвет */
+    color: #fff; /* Белый текст */
+    text-decoration: none; /* Убираем подчёркивание */
+    border-radius: 5px; /* Скруглённые углы */
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s, color 0.3s; /* Анимация при наведении */
+}
+
+.save-button:hover {
+    background-color: #a30000; /* Более светлый бордовый при наведении */
+    color: #f1f1f1; /* Немного светлее текст */
+}
+
+.save-button:active {
+    background-color: #660000; /* Более тёмный бордовый при нажатии */
 }

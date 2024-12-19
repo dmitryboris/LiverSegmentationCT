@@ -52,19 +52,21 @@ def process_images(image_paths):
         'x_col': 0,
         'target_size': (512, 512),
         'color_mode': 'grayscale',
-        'batch_size': len(image_paths),
+        'batch_size': max(1, len(image_paths)),
         'class_mode': None,
         'shuffle': False,
         'seed': 42,
     }
 
     idg_test_data = ImageDataGenerator(
-        samplewise_center=True,
-        samplewise_std_normalization=True
+        samplewise_center=len(image_paths) > 1,  # Только для батчей > 1
+        samplewise_std_normalization=len(image_paths) > 1
     )
     data_g = idg_test_data.flow_from_dataframe(X, **val_gen_params)
 
     batch_images = next(data_g)
+    if len(batch_images.shape) == 3:  # Для одного изображения
+        batch_images = np.expand_dims(batch_images, axis=0)
     predicted_masks = model.predict(batch_images).astype(np.uint8).squeeze()
 
     save_dir_orig = os.path.join(settings.MEDIA_ROOT, 'result/original/')

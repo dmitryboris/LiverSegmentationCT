@@ -18,11 +18,15 @@
     <main class="main">
         <section class="Result_segmentation">
             <div class="section_title_Result"><h1>Результаты сегментации</h1></div>
+            <p class="description">Вы можете исправить контур, просто кликните на нужное изображение</p>
+            <div class="button-container">
+                <a href="#" class="save-button">Сохранить снимки</a>
+            </div>
             {% for image in images %}
-                <p class="btn_name">{{ image.title }}</p>
+                <div class="title">{{ image.title }}</div>
                 <div class="start_block_result_segmentation">
                     <div class="first_part">
-                        <div class="original_picture_desc_text">
+                        <div class="original_picture_text">
                             <h3>Оригинальное изображение</h3>
                         </div>
                         <div class="result_original_image">
@@ -31,7 +35,7 @@
                     </div>
                     <div class="Second_part">
                         <a href="{% url 'image_processing:show_image' image.id %}">
-                            <div class="original_picture_desc_text">
+                            <div class="processed_picture_text">
                                 <h3>Обработанное изображение</h3>
                             </div>
                             <div class="result_original_image">
