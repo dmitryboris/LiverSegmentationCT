@@ -29,6 +29,9 @@ def buffer_images(filenames):
         pil.save(save_path, 'TIFF', compression='none')
         paths.append(save_path)
 
+        if os.path.isfile(filename):
+            os.remove(filename)
+
     return pd.DataFrame(paths)
 
 
@@ -65,7 +68,7 @@ def process_images(image_paths):
     data_g = idg_test_data.flow_from_dataframe(X, **val_gen_params)
 
     batch_images = next(data_g)
-    if len(batch_images.shape) == 3:  # Для одного изображения
+    if len(batch_images.shape) == 3:
         batch_images = np.expand_dims(batch_images, axis=0)
     predicted_masks = model.predict(batch_images).astype(np.uint8).squeeze()
 
@@ -106,6 +109,10 @@ def process_images(image_paths):
         )
 
         segmentation_result.images.add(liver_image)
+
+    for image_path in X[0]:
+        if os.path.isfile(image_path):
+            os.remove(image_path)
 
     return segmentation_result
 

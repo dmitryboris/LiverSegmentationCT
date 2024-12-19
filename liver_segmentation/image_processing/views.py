@@ -3,7 +3,6 @@ import os
 import json
 import zipfile
 from io import BytesIO
-from urllib.parse import urlparse
 
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse
