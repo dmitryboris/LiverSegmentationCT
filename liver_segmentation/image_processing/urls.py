@@ -13,4 +13,5 @@ urlpatterns = [
     path('result/<int:pk>/', views.show_result, name='result'),
     path('image/<int:pk>/', views.show_and_edit_image, name='show_image'),
     path('image/save-edited/<int:pk>/', views.save_edited_image, name='save_edited_image'),
+    path('save-result/<int:pk>/', views.save_processed_images, name='save'),
 ]

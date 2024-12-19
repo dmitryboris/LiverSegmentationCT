@@ -1,10 +1,12 @@
 import base64
 import os
 import json
+import zipfile
+from io import BytesIO
+from urllib.parse import urlparse
 
 from django.conf import settings
-from django.core.files.base import ContentFile
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
@@ -40,7 +42,6 @@ def show_result(request, pk):
     return render(request, 'image_processing/result.html', {'result': result, 'images': images})
 
 
-
 def show_and_edit_image(request, pk):
     image = get_object_or_404(LiverImage, pk=pk)
     return render(request, 'image_processing/show_image.html', {'image': image})
@@ -66,7 +67,7 @@ def save_edited_image(request, pk):
         with open(new_save_path, 'wb') as file:
             file.write(img_data_decoded)
 
-        liver_image.processed_url = new_processed_url
+        liver_image.processed_image = f'result/processed/{filename}'
 
         liver_image.save()
         result = liver_image.segmentation_results.first()
@@ -75,3 +76,21 @@ def save_edited_image(request, pk):
             return JsonResponse({'status': 'success', 'redirect_url': redirect_url})
         return JsonResponse({'status': 'error', 'message': 'Segmentation result not found'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
+
+def save_processed_images(request, pk):
+    result = get_object_or_404(SegmentationResult, pk=pk)
+    images = result.images.all()
+
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for image in images:
+            absolute_path = os.path.join(settings.MEDIA_ROOT, image.processed_image.path)
+            zip_file.write(absolute_path, os.path.basename(absolute_path))
+
+
+    zip_buffer.seek(0)
+    response = HttpResponse(zip_buffer, content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename=segmentation_result_{pk}_processed_images.zip'
+
+    return response

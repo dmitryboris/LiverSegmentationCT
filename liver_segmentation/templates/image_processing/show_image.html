@@ -64,7 +64,7 @@
         const contours = rawPoints.map(([x, y]) => ({ x, y }));
 
         // Загружаем изображение и контур
-        const ktImageUrl = "{{ image.original_url }}";
+        const ktImageUrl = "{{ image.original_image.url }}";
         loadImageAndContour(ktImageUrl, contours);
 
         // Включаем режим рисования

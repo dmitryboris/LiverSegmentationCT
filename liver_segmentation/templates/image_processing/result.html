@@ -20,7 +20,7 @@
             <div class="section_title_Result"><h1>Результаты сегментации</h1></div>
             <p class="description">Вы можете исправить контур, просто кликните на нужное изображение</p>
             <div class="button-container">
-                <a href="#" class="save-button">Сохранить снимки</a>
+                <a href="{% url 'image_processing:save' result.id %}" class="save-button">Сохранить снимки</a>
             </div>
             {% for image in images %}
                 <div class="title">{{ image.title }}</div>
@@ -30,7 +30,7 @@
                             <h3>Оригинальное изображение</h3>
                         </div>
                         <div class="result_original_image">
-                            <img src="{{ image.original_url }}" alt="Оригинальное изображение">
+                            <img src="{{ image.original_image.url }}" alt="Оригинальное изображение">
                         </div>
                     </div>
                     <div class="Second_part">
@@ -39,7 +39,7 @@
                                 <h3>Обработанное изображение</h3>
                             </div>
                             <div class="result_original_image">
-                                <img id="processed-image" src="{{ image.processed_url }}" alt="Обработанное изображение">
+                                <img id="processed-image" src="{{ image.processed_image.url }}" alt="Обработанное изображение">
                             </div>
                         </a>
                     </div>

@@ -81,30 +81,28 @@ def process_images(image_paths):
 
         name = os.path.splitext(os.path.basename(image_path))[0]
         random_prefix = uuid.uuid4()
-        save_path_orig = os.path.join(save_dir_orig, f'{random_prefix}_{name}.png')
+
+        # Генерация относительных путей
+        filename_orig = f'{random_prefix}_{name}.png'
+        filename_proc = f'{random_prefix}_{name}.png'
+
+        # Полные пути для сохранения файлов
+        save_path_orig = os.path.join(save_dir_orig, filename_orig)
+        save_path_proc = os.path.join(save_dir_proc, filename_proc)
+
+        # Сохраняем оригинальное изображение
         Image.fromarray(image_array).save(save_path_orig)
 
+        # Сохраняем обработанное изображение
         image_with_contours, contours = draw_contours(image_array, predicted_mask)
-
-        save_path_proc = os.path.join(save_dir_proc, f'{random_prefix}_{name}.png')
         cv2.imwrite(save_path_proc, image_with_contours)
 
-        processed_url = os.path.join(settings.MEDIA_URL, 'result/processed/', f'{random_prefix}_{name}.png')
-        original_url = os.path.join(settings.MEDIA_URL, 'result/original/', f'{random_prefix}_{name}.png')
-
-        # ускорить?
-        contours_result = []
-        for contour in contours:
-            for point in contour.tolist():
-                contours_result.append(point[0])
-
-        contours_json = json.dumps(contours_result)
-
+        # Создаём объект LiverImage с файлами
         liver_image = LiverImage.objects.create(
             title=name,
-            original_url=original_url,
-            processed_url=processed_url,
-            contours=contours_json,
+            original_image=f'result/original/{filename_orig}',  # Относительный путь
+            processed_image=f'result/processed/{filename_proc}',  # Относительный путь
+            contours=json.dumps([point[0] for contour in contours for point in contour.tolist()]),
         )
 
         segmentation_result.images.add(liver_image)
