@@ -11,3 +11,12 @@ class LiverImage(models.Model):
 
     def __str__(self):
         return f"Image {self.id} - {self.title}"
+
+
+class SegmentationResult(models.Model):
+    id = models.AutoField(primary_key=True)
+
+    images = models.ManyToManyField(LiverImage, related_name="segmentation_results")
+
+    def __str__(self):
+        return f"Segmentation Result {self.id}"

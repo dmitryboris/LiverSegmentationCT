@@ -1,13 +1,17 @@
 import base64
+import os
+import json
 
+from django.conf import settings
 from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from .processing import save_image, process_images
 from .forms import DCMFileUploadForm
-from .models import LiverImage
+from .models import LiverImage, SegmentationResult
 
 
 def upload(request):
@@ -21,21 +25,20 @@ def upload(request):
                 file_path = save_image(file)
                 paths.append(file_path)
 
-            request.session['original_images'] = paths
+            result = process_images(paths)
 
-            return redirect('image_processing:result')
+            return redirect(reverse('image_processing:result', kwargs={'pk': result.id}))
     else:
         form = DCMFileUploadForm()
     return render(request, 'image_processing/upload.html', {'form': form})
 
 
-def result(request):
-    image_paths = request.session.get('original_images')
-    results = process_images(image_paths)
+def show_result(request, pk):
+    result = get_object_or_404(SegmentationResult, pk=pk)
+    images = result.images.all()
 
-    return render(request, 'image_processing/result.html', {
-        'results': results
-    })
+    return render(request, 'image_processing/result.html', {'result': result, 'images': images})
+
 
 
 def show_and_edit_image(request, pk):
@@ -46,11 +49,29 @@ def show_and_edit_image(request, pk):
 @csrf_exempt
 def save_edited_image(request, pk):
     if request.method == 'POST':
-        contour = get_object_or_404(LiverImage, pk=pk)
-        data = request.POST.get('image')
-        image_data = data.split(",")[1]  # Убираем "data:image/png;base64,"
-        """contour.edited_mask.save(
-            f"edited_{pk}.png",
-            ContentFile(base64.b64decode(image_data))
-        )"""
-        return JsonResponse({'status': 'success'})
+        liver_image = get_object_or_404(LiverImage, pk=pk)
+
+        data = json.loads(request.body)
+        img_data = data.get('image')
+        format, imgstr = img_data.split(';base64,')
+        ext = format.split('/')[-1]
+
+        save_dir_url = os.path.join(settings.MEDIA_URL, 'result/processed/')
+        save_dir_path = os.path.join(settings.MEDIA_ROOT, 'result/processed/')
+        filename = f'processed_{pk}.{ext}'
+        new_save_path = os.path.join(save_dir_path, filename)
+        new_processed_url = os.path.join(save_dir_url, filename)
+
+        img_data_decoded = base64.b64decode(imgstr)
+        with open(new_save_path, 'wb') as file:
+            file.write(img_data_decoded)
+
+        liver_image.processed_url = new_processed_url
+
+        liver_image.save()
+        result = liver_image.segmentation_results.first()
+        if result:
+            redirect_url = reverse('image_processing:result', kwargs={'pk': result.id})
+            return JsonResponse({'status': 'success', 'redirect_url': redirect_url})
+        return JsonResponse({'status': 'error', 'message': 'Segmentation result not found'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
