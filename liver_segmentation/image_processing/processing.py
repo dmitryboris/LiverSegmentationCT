@@ -12,6 +12,15 @@ import cv2
 import pandas as pd
 import uuid
 
+model = None
+
+
+def load_model_once():
+    global model
+    if model is None:
+        model = unet_1(1, 512, 512, neurons=8)
+        model.load_weights('unet_r.h5')
+
 
 def buffer_images(filenames):
     buffer_dir = os.path.join(settings.MEDIA_ROOT, 'buffer')
@@ -24,6 +33,8 @@ def buffer_images(filenames):
 
         img, header = load(filename)
         pil = Image.fromarray(img.squeeze())
+
+        pil = pil.resize((512, 512))
 
         save_path = os.path.join(buffer_dir, safe_name)
         pil.save(save_path, 'TIFF', compression='none')
@@ -47,9 +58,7 @@ def draw_contours(image_array, predicted_mask):
 def process_images(image_paths):
     X = buffer_images(image_paths)
 
-    w_size = np.array(Image.open(X[0][0])).shape[0]
-    model = unet_1(1, w_size, w_size, neurons=8)
-    model.load_weights('unet_r.h5')
+    load_model_once()
 
     val_gen_params = {
         'x_col': 0,
